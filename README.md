@@ -109,7 +109,8 @@ working-buddy-design-system/
 ├── README.md
 ├── docs/
 │   ├── tokens.md        ← 최종 확정 토큰 정의 (V3)
-│   └── components.md    ← 최종 확정 컴포넌트 스펙 (V3)
+│   ├── components.md    ← 최종 확정 컴포넌트 스펙 (V3)
+│   └── v4-tokens.md     ← V4 반응형 확장 토큰
 ├── process/
 │   ├── v1-prompt.md     ← V1 프롬프트 원본
 │   ├── v1-raw.md        ← V1 결과물 전체
@@ -121,9 +122,11 @@ working-buddy-design-system/
 │   ├── v3-*-prompt.md   ← V3 각 항목 프롬프트
 │   ├── v3-*-result.md   ← V3 각 항목 결과물
 │   ├── v3-prompt.md     ← V3 전체 프롬프트 기록
-│   └── v3-result.md     ← V3 통합 결과물 (최종)
+│   ├── v3-result.md     ← V3 통합 결과물 (최종)
+│   └── v4-prompt.md     ← V4 토큰 확장·HTML 구현 작업 기록
+├── v4-home.html         ← 반응형 홈 화면 구현 (단일 파일)
 └── assets/
-    └── screenshots/     ← 피그마 화면 캡처 참고 자료
+    └── screenshots/     ← 피그마 원본 + V4 반응형 스크린샷
 ```
 
 ---
@@ -131,6 +134,45 @@ working-buddy-design-system/
 ## Figma 파일
 
 [워킹버디 페이지 (Figma)](https://www.figma.com/design/83wkae6GqgKVxiunaUpjBE/%EC%9B%8C%ED%82%B9%EB%B2%84%EB%94%94-%ED%8E%98%EC%9D%B4%EC%A7%80--Copy-)
+
+---
+
+## V4 — 반응형 웹 확장
+
+V3(모바일 단일, 43토큰)을 반응형 웹 환경으로 확장한 단계.
+V3 토큰은 변경 없이 유지하고, 새 환경에 필요한 토큰만 추가했다.
+
+### 추가된 토큰
+
+| 영역 | 내용 | 수량 |
+|---|---|---|
+| Breakpoints | bp-tablet(640px) / bp-desktop(1024px) | 2개 |
+| Spacing | space-6~12 (24~48px, 4px 그리드) | 4개 |
+| Typography | heading 24px 신규 / display desktop 48px override | 1종 + 1건 |
+| Layout | sidebar-width / content-max-width / topbar-height / grid-gap | 4개 |
+| Radius | radius-xl 16px [tablet+] | 1개 |
+| **합계** | V3 43개 + V4 13개 | **56개** |
+
+상세 내용 → [docs/v4-tokens.md](docs/v4-tokens.md) · 작업 기록 → [process/v4-prompt.md](process/v4-prompt.md)
+
+### 구현 결과 — `v4-home.html`
+
+단일 HTML 파일(CSS·JS 포함)로 3단계 반응형 홈 화면을 구현했다.
+
+| 구분 | 레이아웃 | 네비게이션 |
+|---|---|---|
+| Mobile (0~639px) | 단일 컬럼 | 하단 Bottom Nav |
+| Tablet (640~1023px) | 2컬럼 그리드 | 상단 TopBar 수평 링크 |
+| Desktop (1024px+) | 3컬럼 그리드 | 좌측 사이드바 (240px, 다크 네이비) |
+
+**Mobile**
+![v4 mobile](assets/screenshots/v4-mobile.png)
+
+**Tablet**
+![v4 tablet](assets/screenshots/v4-tablet.png)
+
+**Desktop**
+![v4 desktop](assets/screenshots/v4-desktop.png)
 
 ---
 

@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Buddy — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   V4 DESIGN TOKENS — CSS Variables
+   V3: mobile 기준 원본 (변경 없음)
+   V4: tablet/desktop 확장 추가
+   ============================================================ */
+:root {
+  /* Primitive Colors — V3 */
+  --blue:       #0077CE;
+  --blue-light: #43A6EF;
+  --white:      #FFFFFF;
+  --gray-100:   #F4F4F4;
+  --gray-200:   #EDEDED;
+  --gray-500:   #BBBBBB;
+  --gray-900:   #222222;
+
+  /* Semantic Colors — V3 */
+  --bg-page:       var(--gray-100);
+  --bg-card:       var(--white);
+  --bg-track:      var(--gray-200);
+  --text-primary:  var(--gray-900);
+  --text-inactive: var(--gray-500);
+  --text-on-brand: var(--white);
+  --brand:         var(--blue);
+  --brand-light:   var(--blue-light);
+  --border-card:   var(--white);
+  --disabled:      var(--gray-500);
+
+  /* Typography — V3 */
+  --font-sans:       'Noto Sans KR', -apple-system, sans-serif;
+  --size-label:      11px;
+  --size-caption:    12px;
+  --size-body:       14px;
+  --size-subtitle:   16px;
+  --size-title:      18px;
+  --size-display:    72px;  /* desktop에서 48px로 override [V4] */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --line-height:     1.4;
+  --letter-spacing:  -0.025em;
+
+  /* Spacing — V3 (mobile) */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+
+  /* Spacing — V4 (tablet+) */
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Border Radius — V3 */
+  --radius-md:   10px;
+  --radius-lg:   12px;
+  --radius-full: 9999px;
+
+  /* Border Radius — V4 */
+  --radius-xl: 16px;  /* web card용, tablet+ */
+
+  /* Shadow — V3 */
+  --shadow-card: 0px 0px 16px rgba(0,0,0,0.08);
+  --shadow-nav:  0px 0px 8px rgba(0,0,0,0.08);
+  --shadow-glow: 0px 0px 8px rgba(120,144,238,0.42);
+
+  /* Layout — V4 (desktop only) */
+  --sidebar-width:      240px;
+  --content-max-width:  1100px;
+  --topbar-height:      60px;
+  --grid-gap:           var(--space-5);  /* grid-gap = space-5 참조 */
+
+  /* Sidebar dark navy — V4 설계 결정값 (V4 토큰 스펙 외 추가) */
+  --sidebar-bg:          #0B2D4E;
+  --sidebar-text:        rgba(255,255,255,0.6);
+  --sidebar-text-active: var(--white);
+  --sidebar-accent:      rgba(255,255,255,0.1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  /* body: font-sans, size-body, weight-regular, line-height, letter-spacing */
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  color: var(--text-primary);
+  background: var(--bg-page);  /* bg-page */
+  min-height: 100vh;
+}
+
+a, button { font-family: inherit; }
+button { border: none; background: none; cursor: pointer; padding: 0; }
+ul { list-style: none; }
+
+/* ============================================================
+   MOBILE LAYOUT (default, 0–639px)
+   ============================================================ */
+
+.sidebar { display: none; }  /* hidden mobile */
+
+/* App wrapper */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: calc(56px + 34px);  /* bottom-nav height + iOS safe area */
+}
+
+/* TopBar — V3 spec
+   [mobile] transparent, height 48px
+   padding-top: space-2 / padding-bottom: space-4 / padding-x: space-4 */
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 48px;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  background: var(--bg-page);  /* bg-page (mobile: 투명 효과) */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Logo: size-subtitle / weight-semibold / brand */
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--size-subtitle);
+  font-weight: var(--weight-semibold);
+  color: var(--brand);  /* brand */
+  line-height: 1;
+}
+.topbar-logo svg { width: 24px; height: 24px; flex-shrink: 0; }  /* icon 24×24 */
+
+/* Tablet nav links — hidden mobile, flex tablet, none desktop */
+.topbar-nav { display: none; }
+
+.topbar-nav-link {
+  font-size: var(--size-body);
+  font-weight: var(--weight-medium);
+  color: var(--text-inactive);  /* text-inactive */
+  cursor: pointer;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.topbar-nav-link.active {
+  color: var(--brand);          /* brand (active) */
+  border-bottom-color: var(--brand);
+}
+
+/* Right icons: notification + settings, 24×24 */
+.topbar-actions { display: flex; align-items: center; gap: var(--space-3); }
+.topbar-actions button {
+  width: 24px; height: 24px;
+  color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Main content
+   [mobile] padding space-4 vertical / space-5 horizontal, gap space-4 */
+.main-content {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+}
+
+/* ============================================================
+   GREETING
+   [mobile] size-title / [tablet+] heading 24px semibold [V4]
+   ============================================================ */
+.greeting-date {
+  font-size: var(--size-caption);  /* caption */
+  color: var(--text-inactive);     /* text-inactive */
+  margin-bottom: var(--space-2);
+}
+.greeting-title {
+  font-size: var(--size-title);    /* title (mobile) */
+  font-weight: var(--weight-regular);
+  color: var(--text-primary);
+}
+.greeting-title strong {
+  font-weight: var(--weight-semibold);
+  color: var(--brand);  /* brand */
+}
+.greeting-sub {
+  margin-top: 4px;
+  font-size: var(--size-caption);  /* caption */
+  color: var(--text-inactive);
+}
+
+/* ============================================================
+   CARD (default)
+   [V3] bg-card / radius-lg / shadow-card / padding space-4/space-5
+   [V4 tablet+] radius-xl / padding space-6
+   ============================================================ */
+.card {
+  background: var(--bg-card);       /* bg-card */
+  border-radius: var(--radius-lg);  /* radius-lg → radius-xl on tablet+ [V4] */
+  box-shadow: var(--shadow-card);   /* shadow-card */
+  padding: var(--space-4) var(--space-5);  /* padding-y: space-4 / padding-x: space-5 */
+}
+
+/* Card Grid
+   mobile: flex column / tablet: 2-col / desktop: 3-col */
+.card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Stats card: hidden mobile, shown tablet+ */
+.stats-card { display: none; }
+
+/* ============================================================
+   LEVEL / PROGRESS CARD
+   ============================================================ */
+.level-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);  /* space-3 */
+}
+.level-left { display: flex; align-items: center; gap: var(--space-2); }  /* space-2 */
+
+/* Badge: brand / text-on-brand / label textStyle */
+.level-badge {
+  background: var(--brand);         /* brand */
+  color: var(--text-on-brand);      /* text-on-brand */
+  font-size: var(--size-label);     /* label */
+  font-weight: var(--weight-semibold);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+}
+.level-name {
+  font-size: var(--size-subtitle);  /* subtitle */
+  font-weight: var(--weight-semibold);
+}
+.level-next {
+  font-size: var(--size-caption);   /* caption */
+  color: var(--text-inactive);
+}
+
+/* ProgressBar
+   V3: track bg-track / fill brand / height 12px / radius-full */
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+.progress-label {
+  font-size: var(--size-caption);  /* caption */
+  color: var(--brand);             /* brand */
+}
+.progress-track {
+  height: 12px;                    /* 12px */
+  background: var(--bg-track);    /* bg-track */
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--brand);        /* brand */
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+.progress-info {
+  margin-top: var(--space-2);
+  font-size: var(--size-caption);  /* caption */
+  color: var(--text-inactive);
+  text-align: right;
+}
+
+/* ============================================================
+   QUICK ACTIONS
+   2-col grid, gap space-3
+   ============================================================ */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);  /* space-3 */
+}
+
+/* Card action-brand — 버디 보내기
+   V3: gradient brand-light→brand / radius-md / shadow-glow / height 120px */
+.card-action-brand {
+  background: linear-gradient(144.86deg, var(--brand-light) 0%, var(--brand) 100%);
+  border-radius: var(--radius-md);   /* radius-md */
+  box-shadow: var(--shadow-glow);    /* shadow-glow */
+  border: 1px solid rgba(136,197,242,0.2);
+  height: 120px;
+  padding: var(--space-4);           /* space-4 */
+  color: var(--text-on-brand);       /* text-on-brand */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-align: left;
+}
+.card-action-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 20px rgba(120,144,238,0.5);
+}
+
+/* Card action-surface — AI 챗봇
+   V3: gradient #FFF→#DFE2E5 / radius-md / shadow-card / height 120px */
+.card-action-surface {
+  background: linear-gradient(144.86deg, var(--white) 0%, #DFE2E5 100%);
+  border-radius: var(--radius-md);  /* radius-md */
+  box-shadow: var(--shadow-card);   /* shadow-card */
+  border: 1px solid var(--border-card);  /* border-card */
+  height: 120px;
+  padding: var(--space-4);
+  color: var(--brand);              /* brand */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.15s;
+  text-align: left;
+}
+.card-action-surface:hover { transform: translateY(-2px); }
+
+.action-title {
+  font-size: var(--size-body);       /* body */
+  font-weight: var(--weight-semibold);
+}
+.action-sub { font-size: var(--size-caption); opacity: 0.75; }       /* caption */
+.action-sub-surface { font-size: var(--size-caption); color: var(--text-inactive); }
+
+/* ============================================================
+   SECTION TITLE
+   subtitle / semibold
+   ============================================================ */
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);  /* space-3 */
+  font-size: var(--size-subtitle);  /* subtitle */
+  font-weight: var(--weight-semibold);
+}
+.section-count {
+  font-size: var(--size-caption);  /* caption */
+  font-weight: var(--weight-regular);
+  color: var(--text-inactive);
+}
+
+/* ============================================================
+   MISSION LIST
+   ============================================================ */
+.mission-list { display: flex; flex-direction: column; }
+
+.mission-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);          /* space-3 */
+  padding: var(--space-3) 0;   /* space-3 vertical */
+  border-bottom: 1px solid var(--bg-track);
+}
+.mission-item:first-child { padding-top: 0; }
+.mission-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+/* Checkbox: 20×20, on=brand / off=bg-track border */
+.checkbox {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--bg-track);  /* bg-track (off) */
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.checkbox.on {
+  background: var(--brand);    /* brand (on) */
+  border-color: var(--brand);
+}
+
+/* Mission text: body / done=text-inactive + line-through */
+.mission-text { flex: 1; font-size: var(--size-body); }
+.mission-text.done { color: var(--text-inactive); text-decoration: line-through; }
+
+/* Mission tag: label / bg-track */
+.mission-tag {
+  font-size: var(--size-label);  /* label */
+  font-weight: var(--weight-medium);
+  color: var(--text-inactive);
+  background: var(--bg-track);   /* bg-track */
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   STATS CARD (tablet+)
+   ============================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);  /* space-2 */
+  margin-top: var(--space-3);
+  text-align: center;
+}
+/* stat-value: title / semibold / brand — desktop에서 display(48px) [V4] */
+.stat-achievement {
+  display: block;
+  font-size: var(--size-title);   /* title (mobile/tablet) */
+  font-weight: var(--weight-semibold);
+  color: var(--brand);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  text-align: center;
+  padding: var(--space-3) 0;
+}
+.stat-value {
+  display: block;
+  font-size: var(--size-title);  /* title */
+  font-weight: var(--weight-semibold);
+  color: var(--brand);
+}
+.stat-label {
+  display: block;
+  font-size: var(--size-label);  /* label */
+  color: var(--text-inactive);
+  margin-top: 2px;
+}
+.stat-achievement-label {
+  font-size: var(--size-caption);
+  color: var(--text-inactive);
+  display: block;
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   BUTTON full-width
+   V3: brand / text-on-brand / radius-full / height 54px / title/medium
+   ============================================================ */
+.btn-primary {
+  width: 100%;
+  height: 54px;                      /* 54px */
+  background: var(--brand);          /* brand */
+  color: var(--text-on-brand);       /* text-on-brand */
+  border-radius: var(--radius-full); /* radius-full */
+  font-size: var(--size-title);      /* size-title */
+  font-weight: var(--weight-medium); /* weight-medium */
+  letter-spacing: var(--letter-spacing);
+  font-family: var(--font-sans);
+  padding: 0 var(--space-5);         /* space-5 padding-x */
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+/* ============================================================
+   BOTTOM NAVIGATION (mobile only)
+   V3: bg-card / shadow-nav / padding-top space-3 / padding-bottom 34px (iOS) / padding-x space-4
+   Active: brand / Inactive: text-inactive / Label: label textStyle
+   ============================================================ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-card);    /* bg-card */
+  box-shadow: var(--shadow-nav); /* shadow-nav */
+  padding: var(--space-3) var(--space-4) 34px;  /* padding-bottom: 34px iOS safe area */
+  display: flex;
+  justify-content: space-around;
+  z-index: 200;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer;
+  color: var(--text-inactive);  /* text-inactive */
+}
+.nav-item.active { color: var(--brand); }  /* brand (active) */
+.nav-item svg { width: 24px; height: 24px; }  /* icon 24×24 */
+.nav-label { font-size: var(--size-label); font-weight: var(--weight-medium); }  /* label */
+
+/* ============================================================
+   BREAKPOINT BADGE (dev / portfolio 시연용)
+   ============================================================ */
+.bp-badge {
+  position: fixed;
+  bottom: calc(56px + 34px + var(--space-3));
+  right: var(--space-4);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--size-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  z-index: 9999;
+  pointer-events: none;
+  background: var(--gray-900);
+  color: var(--white);
+  opacity: 0.65;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   TABLET  640px ~ 1023px
+   V4 tokens applied: space-6, space-8, topbar-height, radius-xl
+   ============================================================ */
+@media (min-width: 640px) {
+
+  /* Bottom nav 숨김 */
+  .bottom-nav { display: none; }
+  .app-wrapper { padding-bottom: 0; }
+
+  /* TopBar — bg-card / shadow-nav / height: topbar-height(60px) [V4]
+     padding-x: space-6 [V4] */
+  .topbar {
+    height: var(--topbar-height);  /* topbar-height: 60px [V4] */
+    padding: 0 var(--space-6);     /* space-6 [V4] */
+    background: var(--bg-card);
+    box-shadow: var(--shadow-nav);
+    align-items: center;
+  }
+
+  /* Tablet nav links 표시 */
+  .topbar-nav {
+    display: flex;
+    gap: var(--space-6);  /* space-6 [V4] */
+  }
+
+  /* Main — padding space-6/space-8 [V4], gap space-6 [V4] */
+  .main-content {
+    padding: var(--space-6) var(--space-8);  /* space-6 vertical / space-8 horizontal [V4] */
+    gap: var(--space-6);  /* space-6 [V4] */
+    max-width: calc(var(--content-max-width) + var(--space-8) * 2);
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Card: radius-xl [V4] / padding space-6 */
+  .card {
+    border-radius: var(--radius-xl);  /* radius-xl: 16px [V4 tablet+] */
+    padding: var(--space-6);          /* space-6 [V4] */
+  }
+
+  /* Card grid — 2-col / gap space-6 [V4] */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);  /* space-6 [V4] */
+    align-items: start;
+  }
+
+  /* Level card: tablet에서 2열 span */
+  .level-card { grid-column: 1 / -1; }
+
+  /* Stats card 표시 */
+  .stats-card { display: block; }
+
+  /* Greeting: heading textStyle [V4] — 24px / semibold */
+  .greeting-title {
+    font-size: 24px;               /* heading [V4 tablet+] */
+    font-weight: var(--weight-semibold);
+  }
+
+  /* Breakpoint badge 위치 재조정 */
+  .bp-badge { bottom: var(--space-5); }
+}
+
+/* ============================================================
+   DESKTOP  1024px+
+   V4 tokens applied: sidebar-width, content-max-width, topbar-height, grid-gap
+   ============================================================ */
+@media (min-width: 1024px) {
+
+  /* Sidebar — sidebar-width: 240px [V4] / dark navy */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-width);   /* sidebar-width: 240px [V4] */
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    position: fixed;
+    top: 0; left: 0;
+    padding: var(--space-8) 0;    /* space-8 [V4] */
+    z-index: 300;
+  }
+
+  /* Sidebar logo */
+  .sidebar-logo {
+    padding: 0 var(--space-6) var(--space-8);
+    font-size: var(--size-subtitle);
+    font-weight: var(--weight-semibold);
+    color: var(--white);
+    display: flex; align-items: center; gap: var(--space-3);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Sidebar nav */
+  .sidebar-nav {
+    flex: 1; display: flex; flex-direction: column; gap: 4px;
+    padding: 0 var(--space-3);
+  }
+  .sidebar-nav-item {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);  /* space-3/space-4 */
+    border-radius: var(--radius-md);         /* radius-md */
+    cursor: pointer;
+    color: var(--sidebar-text);
+    font-size: var(--size-body);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .sidebar-nav-item:hover,
+  .sidebar-nav-item.active {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-text-active);
+  }
+  .sidebar-nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .sidebar-footer {
+    padding: var(--space-6);
+    font-size: var(--size-caption);
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* App wrapper — sidebar-width만큼 offset [V4] */
+  .app-wrapper {
+    margin-left: var(--sidebar-width);  /* sidebar-width: 240px [V4] */
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* TopBar — sidebar 있으므로 topbar-nav 숨김 */
+  .topbar {
+    padding: 0 var(--space-10) 0 var(--space-8);  /* space-8/space-10 [V4] */
+  }
+  .topbar-nav { display: none; }
+
+  /* Main content — content-max-width: 1100px [V4] */
+  .main-content {
+    padding: var(--space-8) var(--space-10);  /* space-8/space-10 [V4] */
+    gap: var(--space-8);                       /* space-8 [V4] */
+    max-width: var(--content-max-width);       /* content-max-width: 1100px [V4] */
+    margin: 0 auto;
+  }
+
+  /* Card grid — 3-col / gap: grid-gap(=space-5) [V4] */
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--grid-gap);  /* grid-gap = space-5 [V4] */
+  }
+
+  /* Level card: desktop에서 normal 1/3 col */
+  .level-card { grid-column: auto; }
+
+  /* display textStyle override — 48px on desktop [V4] (V3: 72px) */
+  /* 주간 달성률 숫자에 적용 */
+  .stat-achievement {
+    font-size: 48px;  /* display [V4 desktop] — V3 72px에서 48px로 override */
+  }
+
+  /* Breakpoint badge */
+  .bp-badge { bottom: var(--space-5); right: var(--space-8); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR (desktop only)
+     [V4] sidebar-width: 240px / dark navy bg
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" fill="rgba(67,166,239,0.3)"/>
+      <circle cx="12" cy="12" r="4" fill="white"/>
+      <path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    Working Buddy
+  </div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item active" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      홈
+    </a>
+    <a class="sidebar-nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      리포트
+    </a>
+    <a class="sidebar-nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+      MY
+    </a>
+  </nav>
+  <div class="sidebar-footer">Working Buddy v4.0</div>
+</aside>
+
+<!-- ============================================================
+     APP WRAPPER
+     ============================================================ -->
+<div class="app-wrapper">
+
+  <!-- TOPBAR
+       [mobile] transparent / height 48px / padding space-2/space-4/space-4
+       [tablet+] bg-card / shadow-nav / height topbar-height(60px) [V4] / padding-x space-6 [V4]
+       [desktop] topbar-nav 숨김 (sidebar가 담당) -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" fill="rgba(0,119,206,0.12)"/>
+        <circle cx="12" cy="12" r="4" fill="var(--brand)"/>
+        <path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke="var(--brand)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Working Buddy
+    </div>
+
+    <!-- [tablet only] horizontal nav — size-body / weight-medium / active: brand -->
+    <nav class="topbar-nav">
+      <a class="topbar-nav-link active" href="#">홈</a>
+      <a class="topbar-nav-link" href="#">리포트</a>
+      <a class="topbar-nav-link" href="#">MY</a>
+    </nav>
+
+    <!-- icon 24×24: notification + settings -->
+    <div class="topbar-actions">
+      <button aria-label="알림">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+      </button>
+      <button aria-label="설정">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- GREETING
+         [mobile] size-title / [tablet+] heading 24px semibold [V4] -->
+    <section class="greeting">
+      <p class="greeting-date">2026년 4월 28일 화요일</p>
+      <h1 class="greeting-title">안녕하세요, <strong>이민규</strong>님!</h1>
+      <p class="greeting-sub">오늘도 좋은 직장 생활 되세요 ✨</p>
+    </section>
+
+    <!-- CARD GRID
+         mobile: flex column / tablet: 2-col gap space-6 [V4] / desktop: 3-col gap grid-gap [V4] -->
+    <div class="card-grid">
+
+      <!-- LEVEL PROGRESS CARD
+           Card default: bg-card / radius-lg→radius-xl(tablet+) [V4] / shadow-card -->
+      <article class="card level-card">
+        <div class="level-header">
+          <div class="level-left">
+            <!-- Badge: brand bg / text-on-brand / label textStyle -->
+            <span class="level-badge">Lv.4</span>
+            <span class="level-name">팀플레이어</span>
+          </div>
+          <span class="level-next">Lv.5까지 35% 남음</span>
+        </div>
+        <!-- ProgressBar: track bg-track / fill brand / height 12px / radius-full -->
+        <div class="progress-labels">
+          <span class="progress-label">Lv.4</span>
+          <span class="progress-label">Lv.5</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: 65%;"></div>
+        </div>
+        <p class="progress-info">650 / 1,000 XP</p>
+      </article>
+
+      <!-- MISSION CARD
+           Card default -->
+      <article class="card">
+        <div class="section-title">
+          오늘의 미션
+          <span class="section-count">2 / 4 완료</span>
+        </div>
+        <ul class="mission-list">
+          <!-- Checkbox on: brand / off: bg-track border / text done: text-inactive + strikethrough -->
+          <li class="mission-item">
+            <div class="checkbox on">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="mission-text done">팀원에게 감사 인사하기</span>
+            <!-- tag: label / bg-track -->
+            <span class="mission-tag">소통</span>
+          </li>
+          <li class="mission-item">
+            <div class="checkbox on">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="mission-text done">점심 함께 먹기</span>
+            <span class="mission-tag">관계</span>
+          </li>
+          <li class="mission-item">
+            <div class="checkbox"></div>
+            <span class="mission-text">회의에서 의견 제시하기</span>
+            <span class="mission-tag">리더십</span>
+          </li>
+          <li class="mission-item">
+            <div class="checkbox"></div>
+            <span class="mission-text">동료 도움 요청하기</span>
+            <span class="mission-tag">협업</span>
+          </li>
+        </ul>
+      </article>
+
+      <!-- STATS CARD (hidden mobile, shown tablet+)
+           Card default / stat-achievement: title(tablet) → display 48px(desktop) [V4] -->
+      <article class="card stats-card">
+        <div class="section-title">이번 주 활동</div>
+        <!-- display textStyle: 48px desktop / title 그 외 [V4] -->
+        <span class="stat-achievement">94%</span>
+        <span class="stat-achievement-label">이번 주 달성률</span>
+        <div class="stats-grid">
+          <!-- stat-value: title / semibold / brand -->
+          <div>
+            <span class="stat-value">12</span>
+            <span class="stat-label">버디 전송</span>
+          </div>
+          <div>
+            <span class="stat-value">8</span>
+            <span class="stat-label">미션 완료</span>
+          </div>
+          <div>
+            <span class="stat-value">+320</span>
+            <span class="stat-label">XP 획득</span>
+          </div>
+        </div>
+        <div style="margin-top: var(--space-4);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-2);">
+            <span style="font-size:var(--size-caption); font-weight:var(--weight-medium);">주간 목표</span>
+            <!-- caption / brand -->
+            <span style="font-size:var(--size-caption); color:var(--brand);">8 / 10</span>
+          </div>
+          <!-- ProgressBar: track bg-track / fill brand -->
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 80%;"></div>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /.card-grid -->
+
+    <!-- QUICK ACTIONS
+         2-col grid / gap space-3 -->
+    <div class="quick-actions">
+
+      <!-- Card action-brand: gradient brand-light→brand / radius-md / shadow-glow / height 120px -->
+      <button class="card-action-brand">
+        <div>
+          <!-- action-title: body / semibold -->
+          <div class="action-title">버디 보내기</div>
+          <!-- action-sub: caption -->
+          <div class="action-sub">동료에게 응원 보내기</div>
+        </div>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="14" cy="14" r="12" fill="rgba(255,255,255,0.15)"/>
+          <path d="M9 19l3.5-3.5M12.5 15.5l1.5-5.5 5.5-1.5-1.5 5.5-5.5 1.5z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Card action-surface: gradient #FFF→#DFE2E5 / radius-md / shadow-card / height 120px -->
+      <button class="card-action-surface">
+        <div>
+          <!-- action-title: body / semibold / brand -->
+          <div class="action-title">AI 챗봇</div>
+          <!-- action-sub-surface: caption / text-inactive -->
+          <div class="action-sub-surface">행동 조언 받기</div>
+        </div>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="14" cy="14" r="12" fill="var(--brand)" opacity="0.08"/>
+          <path d="M9 11h10M9 15h7" stroke="var(--brand)" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M21 17.5l2 2-2 1" stroke="var(--brand)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+    </div><!-- /.quick-actions -->
+
+    <!-- BUTTON full-width
+         brand / text-on-brand / radius-full / height 54px / size-title / weight-medium -->
+    <button class="btn-primary">
+      오늘 리포트 보기
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+  </main>
+</div><!-- /app-wrapper -->
+
+<!-- BOTTOM NAVIGATION (mobile only)
+     V3: bg-card / shadow-nav / padding-top space-3 / padding-bottom 34px (iOS) / padding-x space-4
+     active: brand / inactive: text-inactive / label: label textStyle -->
+<nav class="bottom-nav">
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span class="nav-label">HOME</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+    </svg>
+    <span class="nav-label">REPORT</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span class="nav-label">MY</span>
+  </div>
+</nav>
+
+<!-- BREAKPOINT BADGE
+     thresholds: bp-tablet=640px / bp-desktop=1024px [V4] -->
+<div class="bp-badge" id="bp-badge">MOBILE</div>
+
+<script>
+  const badge = document.getElementById('bp-badge');
+
+  function update() {
+    const w = window.innerWidth;
+    // V4 breakpoint tokens: bp-tablet=640 / bp-desktop=1024
+    if (w >= 1024) {
+      badge.textContent = 'DESKTOP';
+      badge.style.background = '#0077CE';  /* --brand */
+      badge.style.opacity = '0.8';
+    } else if (w >= 640) {
+      badge.textContent = 'TABLET';
+      badge.style.background = '#2a6e34';
+      badge.style.opacity = '0.8';
+    } else {
+      badge.textContent = 'MOBILE';
+      badge.style.background = '#222222';  /* --gray-900 */
+      badge.style.opacity = '0.65';
+    }
+  }
+
+  update();
+  window.addEventListener('resize', update);
+</script>
+</body>
+</html>
